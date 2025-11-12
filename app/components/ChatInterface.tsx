@@ -27,7 +27,7 @@ export default function ChatInterface() {
   const [sessionId, setSessionId] = useState<string>('');
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const messageRefs = useRef<HTMLDivElement[]>([]);
 
   useEffect(() => {
     setSessionId(uuidv4());
@@ -190,7 +190,9 @@ export default function ChatInterface() {
             {messages.map((msg, idx) => (
               <div 
                 key={idx}
-                ref={(el) => (messageRefs.current[idx] = el)}
+                ref={(el) => {
+                  if (el) messageRefs.current[idx] = el;
+                }}
                 className={`transition-all duration-300 ${
                   highlightedIndex === idx ? 'ring-2 ring-yellow-400 rounded-2xl' : ''
                 }`}
