@@ -5,14 +5,13 @@ import LiveScoreCard from './LiveScoreCard';
 
 interface Game {
   id: string;
-  home_team: string;
-  away_team: string;
-  home_score: number;
-  away_score: number;
+  date: string;
   status: string;
-  scheduled?: string;
-  date?: string;  // Add missing field
-  venue?: string; // Add missing field
+  home_team: string;
+  home_score: string;
+  away_team: string;
+  away_score: string;
+  venue: string;
 }
 
 export default function LiveScoreTicker() {
