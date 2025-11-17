@@ -34,7 +34,7 @@ export default function GamePrediction({ prediction }: GamePredictionProps) {
       <div className="grid grid-cols-3 gap-4 mb-6">
         {/* Away Team */}
         <div className="text-center">
-          <TeamLogo teamName={prediction.awayTeam} size="lg" />
+          <TeamLogo team={prediction.awayTeam} size="lg" />
           <h3 className="text-xl font-bold text-white mt-3">{prediction.awayTeam}</h3>
           <div className="text-4xl font-bold text-white mt-3">
             {prediction.predictedScore.away}
@@ -54,7 +54,7 @@ export default function GamePrediction({ prediction }: GamePredictionProps) {
 
         {/* Home Team */}
         <div className="text-center">
-          <TeamLogo teamName={prediction.homeTeam} size="lg" />
+          <TeamLogo team={prediction.homeTeam} size="lg" />
           <h3 className="text-xl font-bold text-white mt-3">{prediction.homeTeam}</h3>
           <div className="text-4xl font-bold text-white mt-3">
             {prediction.predictedScore.home}
