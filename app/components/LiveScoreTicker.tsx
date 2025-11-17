@@ -11,6 +11,8 @@ interface Game {
   away_score: number;
   status: string;
   scheduled?: string;
+  date?: string;  // Add missing field
+  venue?: string; // Add missing field
 }
 
 export default function LiveScoreTicker() {
