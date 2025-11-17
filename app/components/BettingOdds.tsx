@@ -79,13 +79,13 @@ function GameOddsCard({ game }: { game: GameOdds }) {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <TeamLogo teamName={game.awayTeam} size="sm" />
+              <TeamLogo team={game.awayTeam} size="sm" />
               <span className="text-white font-semibold">{game.awayTeam}</span>
             </div>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <TeamLogo teamName={game.homeTeam} size="sm" />
+              <TeamLogo team={game.homeTeam} size="sm" />
               <span className="text-white font-semibold">{game.homeTeam}</span>
             </div>
           </div>
