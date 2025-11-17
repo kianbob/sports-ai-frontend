@@ -3,139 +3,78 @@
 import TeamLogo from './TeamLogo';
 
 interface Team {
-  rank?: number;
-  team: string;
+  name: string;
+  market?: string;
   wins: number;
   losses: number;
-  winPct?: number;
-  pointsFor?: number;
-  pointsAgainst?: number;
-  netPoints?: number;
+  win_pct?: number;
+  points_for?: number;
+  points_against?: number;
 }
 
-interface EnhancedStandingsTableProps {
+interface StandingsTableProps {
+  data: Team[];
   title: string;
-  teams: Team[];
-  conference?: string;
-  division?: string;
+  sport?: 'nfl' | 'nba';
 }
 
-export default function EnhancedStandingsTable({
-  title,
-  teams,
-  conference,
-  division,
-}: EnhancedStandingsTableProps) {
-  return (
-    <div className="my-6 rounded-2xl overflow-hidden border border-white/20 bg-gradient-to-br from-slate-800/50 to-purple-900/30 backdrop-blur-lg">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600/30 to-purple-600/30 px-6 py-4 border-b border-white/10">
-        <h3 className="text-xl font-bold text-white">{title}</h3>
-        {(conference || division) && (
-          <p className="text-sm text-gray-300 mt-1">
-            {conference && <span>{conference}</span>}
-            {conference && division && <span className="mx-2">•</span>}
-            {division && <span>{division}</span>}
-          </p>
-        )}
-      </div>
+export default function EnhancedStandingsTable({ data, title, sport = 'nfl' }: StandingsTableProps) {
+  if (!data || data.length === 0) return null;
 
-      {/* Table */}
+  return (
+    <div className="bg-gradient-to-br from-slate-800/80 to-purple-900/40 backdrop-blur-lg rounded-xl border border-white/20 p-6 mb-6">
+      <h3 className="text-xl font-bold text-white mb-4">{title}</h3>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="text-xs text-gray-400 border-b border-white/10">
-              <th className="px-6 py-3 text-left font-semibold uppercase tracking-wider">
-                Rank
-              </th>
-              <th className="px-6 py-3 text-left font-semibold uppercase tracking-wider">
-                Team
-              </th>
-              <th className="px-6 py-3 text-center font-semibold uppercase tracking-wider">
-                Record
-              </th>
-              <th className="px-6 py-3 text-center font-semibold uppercase tracking-wider">
-                Win %
-              </th>
-              {teams[0]?.pointsFor !== undefined && (
+            <tr className="border-b border-white/10">
+              <th className="text-left py-3 px-4 text-gray-300 font-semibold">#</th>
+              <th className="text-left py-3 px-4 text-gray-300 font-semibold">Team</th>
+              <th className="text-center py-3 px-4 text-gray-300 font-semibold">W</th>
+              <th className="text-center py-3 px-4 text-gray-300 font-semibold">L</th>
+              <th className="text-center py-3 px-4 text-gray-300 font-semibold">Win%</th>
+              {sport === 'nfl' && (
                 <>
-                  <th className="px-6 py-3 text-center font-semibold uppercase tracking-wider">
-                    PF
-                  </th>
-                  <th className="px-6 py-3 text-center font-semibold uppercase tracking-wider">
-                    PA
-                  </th>
-                  <th className="px-6 py-3 text-center font-semibold uppercase tracking-wider">
-                    Diff
-                  </th>
+                  <th className="text-center py-3 px-4 text-gray-300 font-semibold">PF</th>
+                  <th className="text-center py-3 px-4 text-gray-300 font-semibold">PA</th>
+                  <th className="text-center py-3 px-4 text-gray-300 font-semibold">Diff</th>
                 </>
               )}
             </tr>
           </thead>
           <tbody>
-            {teams.map((team, idx) => {
-              const winPct = team.winPct || (team.wins / (team.wins + team.losses)) * 100;
-              const diff = team.netPoints || (team.pointsFor || 0) - (team.pointsAgainst || 0);
-              
+            {data.map((team, idx) => {
+              const teamName = team.market ? `${team.market} ${team.name}` : team.name;
+              const winPct = team.win_pct || (team.wins / (team.wins + team.losses));
+              const diff = team.points_for && team.points_against 
+                ? team.points_for - team.points_against 
+                : 0;
+
               return (
-                <tr
+                <tr 
                   key={idx}
-                  className="border-b border-white/5 hover:bg-white/5 transition-colors group"
+                  className="border-b border-white/5 hover:bg-white/5 transition-colors"
                 >
-                  <td className="px-6 py-4">
-                    <span className="text-gray-400 font-mono text-lg">
-                      {team.rank || idx + 1}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
+                  <td className="py-3 px-4 text-gray-400">{idx + 1}</td>
+                  <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
-                      <TeamLogo teamName={team.team} size="md" />
-                      <span className="font-semibold text-white group-hover:text-blue-400 transition-colors">
-                        {team.team}
-                      </span>
+                      <TeamLogo team={teamName} size="sm" sport={sport} />
+                      <span className="text-white font-medium">{teamName}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="font-mono text-green-400 font-bold">
-                        {team.wins}
-                      </span>
-                      <span className="text-gray-500">-</span>
-                      <span className="font-mono text-red-400 font-bold">
-                        {team.losses}
-                      </span>
-                    </div>
+                  <td className="py-3 px-4 text-center text-white font-semibold">{team.wins}</td>
+                  <td className="py-3 px-4 text-center text-gray-300">{team.losses}</td>
+                  <td className="py-3 px-4 text-center text-gray-300">
+                    {(winPct * 100).toFixed(1)}%
                   </td>
-                  <td className="px-6 py-4 text-center">
-                    <div className="flex flex-col items-center">
-                      <span className="font-mono text-blue-400 font-semibold">
-                        {winPct.toFixed(1)}%
-                      </span>
-                      <div className="w-full max-w-[100px] bg-white/10 rounded-full h-1.5 mt-1">
-                        <div
-                          className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all"
-                          style={{ width: `${winPct}%` }}
-                        />
-                      </div>
-                    </div>
-                  </td>
-                  {team.pointsFor !== undefined && (
+                  {sport === 'nfl' && (
                     <>
-                      <td className="px-6 py-4 text-center font-mono text-gray-300">
-                        {team.pointsFor}
-                      </td>
-                      <td className="px-6 py-4 text-center font-mono text-gray-300">
-                        {team.pointsAgainst}
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span
-                          className={`font-mono font-bold ${
-                            diff > 0 ? 'text-green-400' : 'text-red-400'
-                          }`}
-                        >
-                          {diff > 0 ? '+' : ''}
-                          {diff}
-                        </span>
+                      <td className="py-3 px-4 text-center text-gray-300">{team.points_for}</td>
+                      <td className="py-3 px-4 text-center text-gray-300">{team.points_against}</td>
+                      <td className={`py-3 px-4 text-center font-semibold ${
+                        diff > 0 ? 'text-green-400' : diff < 0 ? 'text-red-400' : 'text-gray-300'
+                      }`}>
+                        {diff > 0 ? '+' : ''}{diff}
                       </td>
                     </>
                   )}

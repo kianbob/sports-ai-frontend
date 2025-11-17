@@ -1,89 +1,59 @@
 'use client';
 
 interface TeamLogoProps {
-  teamName: string;
+  team: string;
   size?: 'sm' | 'md' | 'lg';
+  sport?: 'nfl' | 'nba';
 }
 
-export default function TeamLogo({ teamName, size = 'md' }: TeamLogoProps) {
-  const sizeClasses = {
-    sm: 'w-6 h-6 text-xs',
-    md: 'w-10 h-10 text-lg',
-    lg: 'w-16 h-16 text-2xl',
-  };
+const sizeClasses = {
+  sm: 'w-6 h-6',
+  md: 'w-10 h-10',
+  lg: 'w-16 h-16'
+};
 
-  // Get team emoji/icon based on name
-  const getTeamIcon = (name: string): string => {
-    const teamIcons: Record<string, string> = {
+export default function TeamLogo({ team, size = 'md', sport = 'nfl' }: TeamLogoProps) {
+  // Use ESPN's logo API
+  const getTeamAbbr = (teamName: string) => {
+    const abbrs: { [key: string]: string } = {
       // NFL Teams
-      'Chiefs': '🔴',
-      'Bills': '🔵',
-      'Lions': '🦁',
-      'Ravens': '🟣',
-      '49ers': '🔴',
-      'Cowboys': '⭐',
-      'Eagles': '🦅',
-      'Dolphins': '🐬',
-      'Bengals': '🐯',
-      'Browns': '🟤',
-      'Steelers': '⚫',
-      'Packers': '🟢',
-      'Vikings': '🟣',
-      'Patriots': '🔵',
-      'Jets': '🟢',
-      'Rams': '🐏',
-      'Seahawks': '🦅',
-      'Texans': '🔵',
-      'Colts': '🐴',
-      'Titans': '⚡',
-      'Jaguars': '🐆',
-      'Broncos': '🐴',
-      'Chargers': '⚡',
-      'Raiders': '⚫',
-      'Saints': '⚜️',
-      'Falcons': '🦅',
-      'Panthers': '🐆',
-      'Buccaneers': '🏴‍☠️',
-      'Cardinals': '🔴',
-      'Commanders': '🟡',
-      'Giants': '🔵',
-      
+      'Chiefs': 'KC', 'Bills': 'BUF', 'Patriots': 'NE', 'Dolphins': 'MIA',
+      'Ravens': 'BAL', 'Steelers': 'PIT', 'Bengals': 'CIN', 'Browns': 'CLE',
+      'Titans': 'TEN', 'Colts': 'IND', 'Texans': 'HOU', 'Jaguars': 'JAX',
+      'Broncos': 'DEN', 'Raiders': 'LV', 'Chargers': 'LAC', 'Chiefs': 'KC',
+      'Cowboys': 'DAL', 'Eagles': 'PHI', 'Giants': 'NYG', 'Commanders': 'WAS',
+      'Packers': 'GB', 'Bears': 'CHI', 'Lions': 'DET', 'Vikings': 'MIN',
+      'Buccaneers': 'TB', 'Saints': 'NO', 'Panthers': 'CAR', 'Falcons': 'ATL',
+      '49ers': 'SF', 'Rams': 'LAR', 'Seahawks': 'SEA', 'Cardinals': 'ARI',
       // NBA Teams
-      'Lakers': '💜',
-      'Celtics': '🍀',
-      'Warriors': '🟡',
-      'Nets': '⚫',
-      'Knicks': '🟠',
-      'Heat': '🔥',
-      'Nuggets': '⛰️',
-      'Cavaliers': '🍷',
-      'Thunder': '⚡',
-      '76ers': '🔵',
-      'Clippers': '🔴',
-      'Suns': '☀️',
-      'Mavericks': '🔵',
-      'Bucks': '🦌',
-      'Grizzlies': '🐻',
+      'Lakers': 'LAL', 'Celtics': 'BOS', 'Warriors': 'GSW', 'Heat': 'MIA',
+      'Nets': 'BKN', 'Knicks': 'NYK', 'Bucks': 'MIL', 'Suns': 'PHX',
+      'Nuggets': 'DEN', 'Clippers': 'LAC', 'Mavericks': 'DAL', 'Jazz': 'UTA',
     };
-
+    
     // Try to match team name
-    for (const [key, icon] of Object.entries(teamIcons)) {
-      if (name.includes(key)) {
-        return icon;
-      }
+    for (const [name, abbr] of Object.entries(abbrs)) {
+      if (teamName.includes(name)) return abbr;
     }
-
-    return '🏈'; // Default
+    return 'NFL';
   };
 
-  const icon = getTeamIcon(teamName);
+  const abbr = getTeamAbbr(team);
+  const logoUrl = sport === 'nfl' 
+    ? `https://a.espncdn.com/i/teamlogos/nfl/500/${abbr}.png`
+    : `https://a.espncdn.com/i/teamlogos/nba/500/${abbr}.png`;
 
   return (
-    <div
-      className={`${sizeClasses[size]} rounded-lg bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center font-bold border border-white/20`}
-      title={teamName}
-    >
-      {icon}
+    <div className={`${sizeClasses[size]} relative`}>
+      <img
+        src={logoUrl}
+        alt={`${team} logo`}
+        className="w-full h-full object-contain"
+        onError={(e) => {
+          // Fallback to placeholder if logo fails
+          e.currentTarget.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%236366f1"/></svg>';
+        }}
+      />
     </div>
   );
 }
