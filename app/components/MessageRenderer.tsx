@@ -3,6 +3,7 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import PlayerProfile from './sports/PlayerProfile';
+import PlayerComparison from './sports/PlayerComparison';
 
 interface MessageRendererProps {
   content: string;
@@ -17,6 +18,8 @@ export default function MessageRenderer({ content }: MessageRendererProps) {
         const parsed = JSON.parse(jsonStr);
         if (parsed.component === 'player_profile') {
             playerProfileData = parsed.data;
+        } else if (parsed.component === 'player_comparison') {
+            return <PlayerComparison data={parsed.data} />;
         }
      }
   } catch (e) { }
