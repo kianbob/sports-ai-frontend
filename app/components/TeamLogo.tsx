@@ -20,7 +20,7 @@ export default function TeamLogo({ team, size = 'md', sport = 'nfl' }: TeamLogoP
       'Chiefs': 'KC', 'Bills': 'BUF', 'Patriots': 'NE', 'Dolphins': 'MIA',
       'Ravens': 'BAL', 'Steelers': 'PIT', 'Bengals': 'CIN', 'Browns': 'CLE',
       'Titans': 'TEN', 'Colts': 'IND', 'Texans': 'HOU', 'Jaguars': 'JAX',
-      'Broncos': 'DEN', 'Raiders': 'LV', 'Chargers': 'LAC', 'Chiefs': 'KC',
+      'Broncos': 'DEN', 'Raiders': 'LV', 'Chargers': 'LAC',
       'Cowboys': 'DAL', 'Eagles': 'PHI', 'Giants': 'NYG', 'Commanders': 'WAS',
       'Packers': 'GB', 'Bears': 'CHI', 'Lions': 'DET', 'Vikings': 'MIN',
       'Buccaneers': 'TB', 'Saints': 'NO', 'Panthers': 'CAR', 'Falcons': 'ATL',
