@@ -1,5 +1,4 @@
 'use client';
-
 import TeamLogo from '../TeamLogo';
 
 interface PlayerProfileProps {
@@ -8,23 +7,20 @@ interface PlayerProfileProps {
     position: string;
     team: string;
     jersey?: string;
-    stats: any; // Raw API response
+    stats: any;
   };
 }
 
 export default function PlayerProfile({ data }: PlayerProfileProps) {
-  // Extract some sample stats from the raw data (customize based on actual API response structure)
-  // Note: Sportradar structure varies, checking for common fields
-  const stats = data.stats;
+  const stats = data.stats || {};
   const birthDate = stats.birth_date || stats.birthdate || 'N/A';
   const college = stats.college || 'N/A';
   const height = stats.height ? `${stats.height} in` : 'N/A';
   const weight = stats.weight ? `${stats.weight} lbs` : 'N/A';
+  const rookieYear = stats.rookie_year || 'N/A';
 
   return (
     <div className="my-6 bg-gradient-to-br from-slate-800/90 to-blue-900/40 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden shadow-2xl">
-      
-      {/* Header Card */}
       <div className="relative p-6 flex items-center justify-between border-b border-white/10 bg-white/5">
         <div className="flex items-center gap-5">
           <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-3xl font-bold text-white shadow-lg ring-4 ring-white/10">
@@ -43,35 +39,25 @@ export default function PlayerProfile({ data }: PlayerProfileProps) {
             </div>
           </div>
         </div>
-        
-        {/* Physical Stats */}
-        <div className="hidden md:block text-right text-sm text-gray-400 space-y-1">
-           <div>Height: <span className="text-white">{height}</span></div>
-           <div>Weight: <span className="text-white">{weight}</span></div>
-           <div>College: <span className="text-white">{college}</span></div>
-        </div>
       </div>
 
-      {/* Body Content */}
-      <div className="p-6">
-        <div className="bg-black/20 rounded-xl p-4 border border-white/5">
-          <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Player Bio</h3>
-          <p className="text-gray-300 leading-relaxed text-sm">
-             Detailed season statistics for {data.name} are retrieved directly from Sportradar official feeds. 
-             (Note: Displaying full season stats requires mapping nested JSON fields specific to the sport).
-          </p>
-        </div>
-        
-        <div className="mt-4 grid grid-cols-2 gap-4">
-            <div className="bg-white/5 rounded-lg p-4 text-center border border-white/5">
-                <div className="text-2xl font-bold text-white">Active</div>
-                <div className="text-xs text-gray-400 uppercase">Status</div>
-            </div>
-             <div className="bg-white/5 rounded-lg p-4 text-center border border-white/5">
-                <div className="text-2xl font-bold text-white">{birthDate}</div>
-                <div className="text-xs text-gray-400 uppercase">Birth Date</div>
-            </div>
-        </div>
+      <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white/5 rounded-lg p-3 text-center border border-white/5">
+            <div className="text-gray-400 text-xs uppercase">Height</div>
+            <div className="text-xl font-bold text-white">{height}</div>
+          </div>
+          <div className="bg-white/5 rounded-lg p-3 text-center border border-white/5">
+            <div className="text-gray-400 text-xs uppercase">Weight</div>
+            <div className="text-xl font-bold text-white">{weight}</div>
+          </div>
+          <div className="bg-white/5 rounded-lg p-3 text-center border border-white/5">
+            <div className="text-gray-400 text-xs uppercase">College</div>
+            <div className="text-xl font-bold text-white truncate">{college}</div>
+          </div>
+          <div className="bg-white/5 rounded-lg p-3 text-center border border-white/5">
+            <div className="text-gray-400 text-xs uppercase">Rookie Year</div>
+            <div className="text-xl font-bold text-white">{rookieYear}</div>
+          </div>
       </div>
     </div>
   );

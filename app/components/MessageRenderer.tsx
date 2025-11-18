@@ -9,24 +9,17 @@ interface MessageRendererProps {
 }
 
 export default function MessageRenderer({ content }: MessageRendererProps) {
-  
-  // 1. Check if the message contains our special JSON component block
-  // Pattern: {'component': 'player_profile', ...}
-  // We use a simple heuristic since the AI returns stringified dicts
   let playerProfileData = null;
   
   try {
      if (content.includes("'component': 'player_profile'") || content.includes('"component": "player_profile"')) {
-        // This is hacky but works for mixed text/json responses from Python string representation
         const jsonStr = content.replace(/'/g, '"').trim(); 
         const parsed = JSON.parse(jsonStr);
         if (parsed.component === 'player_profile') {
             playerProfileData = parsed.data;
         }
      }
-  } catch (e) {
-     // Not valid JSON, render as text
-  }
+  } catch (e) { }
 
   if (playerProfileData) {
      return <PlayerProfile data={playerProfileData} />;
