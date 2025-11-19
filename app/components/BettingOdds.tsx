@@ -23,19 +23,15 @@ interface Bookmaker {
 interface GameOdds {
   id: string;
   sport: string;
-  // Support both formats just in case
   home_team?: string;
   homeTeam?: string;
   away_team?: string;
   awayTeam?: string;
-  commence_time?: string;
-  commenceTime?: string;
   bookmakers: Bookmaker[];
 }
 
 export default function BettingOdds({ data }: { data: { games: GameOdds[] } }) {
   const [selectedBet, setSelectedBet] = useState<string | null>(null);
-  // Handle case where data might be wrapped differently
   const games = data.games || (Array.isArray(data) ? data : []);
 
   const handleBet = async (gameId: string, selection: string, odds: number, type: string, book: string) => {
@@ -51,10 +47,8 @@ export default function BettingOdds({ data }: { data: { games: GameOdds[] } }) {
         bet_type: type,
         sportsbook: book
       });
-      // Visual feedback is handled by state
     } catch (e) {
       console.error("Bet error", e);
-      // Don't alert, just keep UI state
     }
     
     setTimeout(() => setSelectedBet(null), 2000);
@@ -73,7 +67,6 @@ export default function BettingOdds({ data }: { data: { games: GameOdds[] } }) {
       <h2 className="text-2xl font-bold text-white flex items-center gap-2">🎲 Betting Odds</h2>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {games.slice(0, 8).map((game) => {
-           // Handle variable naming differences
            const homeName = game.home_team || game.homeTeam || "Home";
            const awayName = game.away_team || game.awayTeam || "Away";
            const bookmaker = game.bookmakers?.[0];
@@ -99,10 +92,14 @@ export default function BettingOdds({ data }: { data: { games: GameOdds[] } }) {
                </div>
                
                <div className="space-y-3">
-                 {/* Spread Buttons */}
                  {spread.length > 0 && (
                    <div className="grid grid-cols-2 gap-2">
-                      {spread.map((outcome, i) => (
+                      {spread.map((outcome, i) => {
+                        // TYPE SAFETY FIX HERE
+                        const point = outcome.point ?? 0;
+                        const pointDisplay = point > 0 ? `+${point}` : `${point}`;
+                        
+                        return (
                         <button
                           key={`spread-${i}`}
                           onClick={() => handleBet(game.id, outcome.name, outcome.price, 'spread', bookmaker.name)}
@@ -113,16 +110,15 @@ export default function BettingOdds({ data }: { data: { games: GameOdds[] } }) {
                             : 'bg-white/5 text-gray-300 hover:bg-white/10 border border-white/5'
                           } border`}
                         >
-                          <span className="truncate mr-1">{outcome.point > 0 ? '+' : ''}{outcome.point}</span>
+                          <span className="truncate mr-1">{outcome.point !== undefined ? pointDisplay : ''}</span>
                           <span className={selectedBet === `${game.id}-${outcome.name}` ? 'text-white' : 'text-blue-400'}>
                             {outcome.price > 0 ? '+' : ''}{outcome.price}
                           </span>
                         </button>
-                      ))}
+                      )})}
                    </div>
                  )}
                  
-                 {/* Moneyline Buttons */}
                  {h2h.length > 0 && (
                    <div className="grid grid-cols-2 gap-2">
                       {h2h.map((outcome, i) => (
