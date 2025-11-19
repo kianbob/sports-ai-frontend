@@ -14,7 +14,6 @@ export default function FeaturesPage() {
     winPercent: 0.882,
     division: 'AFC West',
   };
-
   const team2 = {
     name: 'Detroit Lions',
     wins: 15,
@@ -25,13 +24,14 @@ export default function FeaturesPage() {
     division: 'NFC North',
   };
 
+  // Demo Odds - Updated to match new strict interface
   const demoOdds = [
     {
       id: '1',
       sport: 'NFL',
-      homeTeam: 'Kansas City Chiefs',
-      awayTeam: 'Buffalo Bills',
-      commenceTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+      home_team: 'Kansas City Chiefs', // Updated keys to match interface
+      away_team: 'Buffalo Bills',    // Updated keys to match interface
+      commence_time: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // Updated key
       bookmakers: [
         {
           name: 'DraftKings',
@@ -106,7 +106,8 @@ export default function FeaturesPage() {
 
         <TeamComparison team1={team1} team2={team2} />
         
-        <BettingOdds games={demoOdds} />
+        {/* Fixed Prop: Passing 'data' object wrapping games */}
+        <BettingOdds data={{ games: demoOdds }} />
         
         <PlayerStatsCard player={demoPlayer} sport="nfl" />
         
