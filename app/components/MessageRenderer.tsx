@@ -14,29 +14,34 @@ export default function MessageRenderer({ content }: MessageRendererProps) {
   let playerComparisonData = null;
   
   try {
-     // 1. Clean the content string to remove markdown code blocks if present
-     // This handles cases where AI wraps JSON in ```json ... ```
+     // 1. Clean the content string (remove markdown blocks)
      const cleanContent = content.replace(/```json/g, '').replace(/```/g, '').trim();
 
-     // 2. Check for our special component signals in the cleaned string
-     if (cleanContent.includes('"ui_component_request"')) {
+     // 2. Check for our specific component wrapper
+     if (cleanContent.includes("ui_component_request")) {
+        // Try to parse the whole thing as JSON first
         const parsed = JSON.parse(cleanContent);
-        
         if (parsed.ui_component_request?.type === 'player_profile') {
             playerProfileData = parsed.ui_component_request.payload;
         } else if (parsed.ui_component_request?.type === 'player_comparison') {
             playerComparisonData = parsed.ui_component_request.payload;
         }
      }
-     // Fallback support for older format (just in case)
-     else if (cleanContent.includes("'component': 'player_profile'") || cleanContent.includes('"component": "player_profile"')) {
-        const jsonStr = cleanContent.replace(/'/g, '"'); 
-        const parsed = JSON.parse(jsonStr);
-        if (parsed.component === 'player_profile') playerProfileData = parsed.data;
-        if (parsed.component === 'player_comparison') playerComparisonData = parsed.data;
+     // 3. Aggressive fallback: Look for the JSON pattern inside text
+     // Sometimes the AI says "Here is the JSON: { ... }"
+     else {
+        const jsonMatch = content.match(/\{[\s\S]*"ui_component_request"[\s\S]*\}/);
+        if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (parsed.ui_component_request?.type === 'player_profile') {
+                playerProfileData = parsed.ui_component_request.payload;
+            } else if (parsed.ui_component_request?.type === 'player_comparison') {
+                playerComparisonData = parsed.ui_component_request.payload;
+            }
+        }
      }
   } catch (e) {
-     // If parsing fails, it's just regular text/markdown, so we let ReactMarkdown handle it below
+     // Parsing failed, fall back to text rendering
   }
 
   if (playerProfileData) return <PlayerProfile data={playerProfileData} />;
