@@ -17,12 +17,11 @@ export default function MessageRenderer({ content }: MessageRendererProps) {
   
   try {
      const cleanContent = content.replace(/```json/g, '').replace(/```/g, '').trim();
-
      if (cleanContent.includes("ui_component_request")) {
         const jsonMatch = cleanContent.match(/\{[\s\S]*"ui_component_request"[\s\S]*\}/);
         const jsonStr = jsonMatch ? jsonMatch[0] : cleanContent;
-        
         const parsed = JSON.parse(jsonStr);
+        
         if (parsed.ui_component_request) {
             componentType = parsed.ui_component_request.type;
             componentData = parsed.ui_component_request.payload;
