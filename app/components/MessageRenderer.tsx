@@ -14,11 +14,13 @@ export default function MessageRenderer({ content }: MessageRendererProps) {
   let playerComparisonData = null;
   
   try {
-     // Check for our new wrapper format "ui_component_request"
-     if (content.includes("ui_component_request")) {
-        // Clean up any markdown code blocks the AI might have wrapped it in
-        const cleanJson = content.replace(/```json/g, '').replace(/```/g, '').trim();
-        const parsed = JSON.parse(cleanJson);
+     // 1. Clean the content string to remove markdown code blocks if present
+     // This handles cases where AI wraps JSON in ```json ... ```
+     const cleanContent = content.replace(/```json/g, '').replace(/```/g, '').trim();
+
+     // 2. Check for our special component signals in the cleaned string
+     if (cleanContent.includes('"ui_component_request"')) {
+        const parsed = JSON.parse(cleanContent);
         
         if (parsed.ui_component_request?.type === 'player_profile') {
             playerProfileData = parsed.ui_component_request.payload;
@@ -26,14 +28,16 @@ export default function MessageRenderer({ content }: MessageRendererProps) {
             playerComparisonData = parsed.ui_component_request.payload;
         }
      }
-     // Fallback to old check
-     else if (content.includes("'component': 'player_profile'") || content.includes('"component": "player_profile"')) {
-        const jsonStr = content.replace(/'/g, '"').trim(); 
+     // Fallback support for older format (just in case)
+     else if (cleanContent.includes("'component': 'player_profile'") || cleanContent.includes('"component": "player_profile"')) {
+        const jsonStr = cleanContent.replace(/'/g, '"'); 
         const parsed = JSON.parse(jsonStr);
         if (parsed.component === 'player_profile') playerProfileData = parsed.data;
         if (parsed.component === 'player_comparison') playerComparisonData = parsed.data;
      }
-  } catch (e) {}
+  } catch (e) {
+     // If parsing fails, it's just regular text/markdown, so we let ReactMarkdown handle it below
+  }
 
   if (playerProfileData) return <PlayerProfile data={playerProfileData} />;
   if (playerComparisonData) return <PlayerComparison data={playerComparisonData} />;
