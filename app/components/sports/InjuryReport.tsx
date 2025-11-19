@@ -7,7 +7,6 @@ interface Injury {
   position: string;
   jersey: string;
   status: string;
-  start_date: string;
   practice_status: string;
   desc: string;
 }
@@ -15,25 +14,24 @@ interface Injury {
 interface InjuryReportProps {
   data: {
     team: string;
-    data: {
-        injuries: Injury[];
-    }
+    injuries: Injury[];
+    week: string | number;
   };
 }
 
 export default function InjuryReport({ data }: InjuryReportProps) {
-  const injuries = data.data?.injuries || [];
+  const injuries = data.injuries || [];
 
   const getStatusColor = (status: string) => {
     const s = (status || '').toLowerCase();
-    if (s.includes('out') || s.includes('ir')) return 'text-red-500 bg-red-500/10 border-red-500/20';
-    if (s.includes('doubtful')) return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
-    if (s.includes('questionable')) return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
-    return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
+    if (s.includes('out') || s.includes('ir') || s.includes('injured reserve')) return 'bg-red-500/20 text-red-400 border-red-500/30';
+    if (s.includes('doubtful')) return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+    if (s.includes('questionable')) return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+    return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
   };
 
   return (
-    <div className="my-6 bg-slate-900/80 backdrop-blur-xl rounded-xl border border-white/10 overflow-hidden shadow-xl">
+    <div className="my-6 bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl border border-white/10 overflow-hidden shadow-xl">
       <div className="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <TeamLogo team={data.team} size="md" />

@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm';
 import PlayerProfile from './sports/PlayerProfile';
 import PlayerComparison from './sports/PlayerComparison';
 import InjuryReport from './sports/InjuryReport';
+import BettingOdds from './BettingOdds';
 
 interface MessageRendererProps {
   content: string;
@@ -16,9 +17,8 @@ export default function MessageRenderer({ content }: MessageRendererProps) {
   
   try {
      const cleanContent = content.replace(/```json/g, '').replace(/```/g, '').trim();
-     // Look for our specific JSON structure
+
      if (cleanContent.includes("ui_component_request")) {
-        // Handle case where AI might output text before/after JSON
         const jsonMatch = cleanContent.match(/\{[\s\S]*"ui_component_request"[\s\S]*\}/);
         const jsonStr = jsonMatch ? jsonMatch[0] : cleanContent;
         
@@ -33,6 +33,7 @@ export default function MessageRenderer({ content }: MessageRendererProps) {
   if (componentType === 'player_profile') return <PlayerProfile data={componentData} />;
   if (componentType === 'player_comparison') return <PlayerComparison data={componentData} />;
   if (componentType === 'injury_report') return <InjuryReport data={componentData} />;
+  if (componentType === 'betting_odds') return <BettingOdds data={componentData} />;
 
   return (
     <div className="prose prose-invert max-w-none">
