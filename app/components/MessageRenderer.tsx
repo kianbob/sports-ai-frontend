@@ -14,15 +14,23 @@ export default function MessageRenderer({ content }: MessageRendererProps) {
   let playerComparisonData = null;
   
   try {
-     // Heuristic to detect our special JSON components
-     if (content.includes("'component': 'player_profile'") || content.includes('"component": "player_profile"')) {
+     // Check for our new wrapper format "ui_component_request"
+     if (content.includes("ui_component_request")) {
+        // Clean up any markdown code blocks the AI might have wrapped it in
+        const cleanJson = content.replace(/```json/g, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(cleanJson);
+        
+        if (parsed.ui_component_request?.type === 'player_profile') {
+            playerProfileData = parsed.ui_component_request.payload;
+        } else if (parsed.ui_component_request?.type === 'player_comparison') {
+            playerComparisonData = parsed.ui_component_request.payload;
+        }
+     }
+     // Fallback to old check
+     else if (content.includes("'component': 'player_profile'") || content.includes('"component": "player_profile"')) {
         const jsonStr = content.replace(/'/g, '"').trim(); 
         const parsed = JSON.parse(jsonStr);
         if (parsed.component === 'player_profile') playerProfileData = parsed.data;
-     }
-     else if (content.includes("'component': 'player_comparison'") || content.includes('"component": "player_comparison"')) {
-        const jsonStr = content.replace(/'/g, '"').trim(); 
-        const parsed = JSON.parse(jsonStr);
         if (parsed.component === 'player_comparison') playerComparisonData = parsed.data;
      }
   } catch (e) {}
