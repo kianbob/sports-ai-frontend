@@ -1,8 +1,6 @@
 'use client';
 
 import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface MessageRendererProps {
   content: string;
@@ -14,18 +12,11 @@ export default function MessageRenderer({ content }: MessageRendererProps) {
       <ReactMarkdown
         components={{
           code({ node, inline, className, children, ...props }) {
-            const match = /language-(\w+)/.exec(className || '');
-            return !inline && match ? (
-              <SyntaxHighlighter
-                style={vscDarkPlus as any}
-                language={match[1]}
-                PreTag="div"
+            return (
+              <code 
+                className={`${className} bg-gray-800 px-2 py-1 rounded text-sm ${!inline && 'block p-4 my-2'}`} 
                 {...props}
               >
-                {String(children).replace(/\n$/, '')}
-              </SyntaxHighlighter>
-            ) : (
-              <code className={className} {...props}>
                 {children}
               </code>
             );
