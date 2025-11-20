@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
@@ -69,6 +70,8 @@ export default function ChatInterface() {
             <h1 className="text-2xl font-bold text-white flex items-center gap-2">🏈 Sports AI</h1>
             <div className="flex gap-2">
               <SearchConversation messages={messages} onHighlight={handleHighlight} />
+              
+              {/* BUTTONS */}
               <Link href="/analytics" className="px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-lg flex items-center gap-2 transition-colors">
                 <ChartBarIcon className="w-5 h-5" />
                 <span className="hidden sm:inline">Analytics</span>
@@ -77,13 +80,16 @@ export default function ChatInterface() {
                 <UserCircleIcon className="w-5 h-5" />
                 <span className="hidden sm:inline">My Bets</span>
               </Link>
+
               <button onClick={clearChat} className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-colors">
                 <TrashIcon className="w-5 h-5" />
               </button>
             </div>
           </div>
         </header>
+
         <LiveScoreTicker />
+
         <div className="flex-1 overflow-y-auto p-4">
           <div className="max-w-4xl mx-auto space-y-4">
             {messages.length === 0 && (

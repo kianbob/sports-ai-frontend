@@ -6,6 +6,7 @@ import PlayerProfile from './sports/PlayerProfile';
 import PlayerComparison from './sports/PlayerComparison';
 import InjuryReport from './sports/InjuryReport';
 import BettingOdds from './BettingOdds';
+import TeamComparison from './TeamComparison'; // Import this!
 
 interface MessageRendererProps {
   content: string;
@@ -16,23 +17,23 @@ export default function MessageRenderer({ content }: MessageRendererProps) {
   let componentType = null;
   
   try {
-     // Aggressively find JSON object inside content
-     const jsonMatch = content.match(/\{[\s\S]*"ui_component_request"[\s\S]*\}/);
-     const jsonStr = jsonMatch ? jsonMatch[0] : content.replace(/```json/g, '').replace(/```/g, '').trim();
-     
+     const cleanContent = content.replace(/```json/g, '').replace(/```/g, '').trim();
+     // Parse JSON
+     const jsonMatch = cleanContent.match(/\{[\s\S]*"ui_component_request"[\s\S]*\}/);
+     const jsonStr = jsonMatch ? jsonMatch[0] : cleanContent;
      const parsed = JSON.parse(jsonStr);
+     
      if (parsed.ui_component_request) {
         componentType = parsed.ui_component_request.type;
         componentData = parsed.ui_component_request.payload;
      }
-  } catch (e) {
-      // Fallback for Markdown
-  }
+  } catch (e) {}
 
   if (componentType === 'player_profile') return <PlayerProfile data={componentData} />;
   if (componentType === 'player_comparison') return <PlayerComparison data={componentData} />;
   if (componentType === 'injury_report') return <InjuryReport data={componentData} />;
   if (componentType === 'betting_odds') return <BettingOdds data={componentData} />;
+  if (componentType === 'team_comparison') return <TeamComparison team1={componentData.team1} team2={componentData.team2} />; // Handle Team Comparison
 
   return (
     <div className="prose prose-invert max-w-none">
