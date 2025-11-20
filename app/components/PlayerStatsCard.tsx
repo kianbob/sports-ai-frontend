@@ -16,11 +16,10 @@ interface PlayerStatsCardProps {
 }
 
 export default function PlayerStatsCard({ player, sport }: PlayerStatsCardProps) {
-  // Map backend keys to display labels
   const getStatValue = (key: string) => {
-      // Handle different casing from backend
-      const val = player.stats[key] || player.stats[key.toLowerCase()] || player.stats[key.toUpperCase()] || 0;
-      return Math.round(Number(val)); // Ensure we show whole numbers for yards
+      const val = player.stats[key] || player.stats[key.toLowerCase()] || 0;
+      // Fix: Ensure numbers are rounded (removes decimals)
+      return Math.round(Number(val));
   };
 
   const statsToShow = sport === 'nfl' ? [
@@ -60,10 +59,6 @@ export default function PlayerStatsCard({ player, sport }: PlayerStatsCardProps)
               <div className="text-xs text-gray-400 uppercase tracking-wide">{stat.label}</div>
             </div>
         ))}
-      </div>
-      
-      <div className="mt-4 pt-4 border-t border-white/10 text-center text-xs text-gray-500">
-         2023-2024 Season Stats
       </div>
     </div>
   );

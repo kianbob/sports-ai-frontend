@@ -1,12 +1,11 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 import { ChartBarIcon, ClockIcon, ChatBubbleLeftIcon, FireIcon } from '@heroicons/react/24/solid';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-// ... (Interfaces remain same) ...
 interface OverviewStats {
   total_conversations: number;
   total_messages: number;
@@ -45,16 +44,18 @@ export default function AnalyticsDashboard() {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
+        // Use simple Promise.all to fetch data in parallel
         const [overviewRes, queriesRes, timesRes, timelineRes] = await Promise.all([
-          axios.get(`${API_URL}/analytics/overview`),
-          axios.get(`${API_URL}/analytics/popular-queries?limit=5`),
-          axios.get(`${API_URL}/analytics/response-times`),
-          axios.get(`${API_URL}/analytics/activity-timeline?days=7`),
+          axios.get(`${API_URL}/analytics/overview`).catch(() => ({ data: null })),
+          axios.get(`${API_URL}/analytics/popular-queries?limit=5`).catch(() => ({ data: [] })),
+          axios.get(`${API_URL}/analytics/response-times`).catch(() => ({ data: null })),
+          axios.get(`${API_URL}/analytics/activity-timeline?days=7`).catch(() => ({ data: [] })),
         ]);
-        setStats(overviewRes.data);
-        setPopularQueries(queriesRes.data);
-        setResponseTimes(timesRes.data);
-        setActivityTimeline(timelineRes.data);
+        
+        if (overviewRes.data) setStats(overviewRes.data);
+        if (queriesRes.data) setPopularQueries(queriesRes.data);
+        if (timesRes.data) setResponseTimes(timesRes.data);
+        if (timelineRes.data) setActivityTimeline(timelineRes.data);
       } catch (error) {
         console.error('Error fetching analytics:', error);
       } finally {
@@ -75,7 +76,6 @@ export default function AnalyticsDashboard() {
     );
   }
 
-  // Format data for charts
   const responseTimeData = [
     { name: 'Fast (<3s)', value: responseTimes?.fast_responses || 0, fill: '#22c55e' },
     { name: 'Medium (3-10s)', value: responseTimes?.medium_responses || 0, fill: '#eab308' },
@@ -86,7 +86,7 @@ export default function AnalyticsDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-2">📊 Analytics Dashboard</h1>
-        <p className="text-gray-400 mb-8">Real-time performance metrics for your AI assistant</p>
+        <p className="text-gray-400 mb-8">Real-time performance metrics</p>
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -97,7 +97,7 @@ export default function AnalyticsDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Activity Timeline Chart */}
+          {/* Activity Timeline */}
           <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-white/10 p-6">
             <h3 className="text-xl font-bold text-white mb-6">User Activity (7 Days)</h3>
             <div className="h-64">
@@ -107,14 +107,13 @@ export default function AnalyticsDashboard() {
                         <XAxis dataKey="date" stroke="#94a3b8" tickFormatter={(str) => new Date(str).toLocaleDateString(undefined, {weekday:'short'})} />
                         <YAxis stroke="#94a3b8" />
                         <Tooltip contentStyle={{backgroundColor: '#1e293b', border: 'none', borderRadius: '8px'}} />
-                        <Line type="monotone" dataKey="messages" stroke="#8b5cf6" strokeWidth={3} dot={{r: 4}} activeDot={{r: 8}} />
-                        <Line type="monotone" dataKey="conversations" stroke="#3b82f6" strokeWidth={3} dot={{r: 4}} />
+                        <Line type="monotone" dataKey="messages" stroke="#8b5cf6" strokeWidth={3} dot={{r: 4}} />
                     </LineChart>
                 </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Response Time Chart */}
+          {/* Response Times */}
           <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-white/10 p-6">
              <h3 className="text-xl font-bold text-white mb-6">Performance Distribution</h3>
              <div className="h-64">
@@ -130,41 +129,21 @@ export default function AnalyticsDashboard() {
              </div>
           </div>
         </div>
-
-        {/* Popular Queries Table */}
-        <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-white/10 p-6">
-             <h3 className="text-xl font-bold text-white mb-4">🔥 Trending Topics</h3>
-             <div className="overflow-hidden">
-                 <table className="w-full text-left">
-                     <thead>
-                         <tr className="border-b border-white/10 text-gray-400 text-sm uppercase">
-                             <th className="py-3">Query Topic</th>
-                             <th className="py-3 text-right">Count</th>
-                             <th className="py-3 text-right">Trend</th>
-                         </tr>
-                     </thead>
-                     <tbody className="divide-y divide-white/5">
-                         {popularQueries.map((q, i) => (
-                             <tr key={i} className="hover:bg-white/5 transition-colors">
-                                 <td className="py-3 text-white font-medium">{q.query}</td>
-                                 <td className="py-3 text-right text-blue-400 font-mono">{q.count}</td>
-                                 <td className="py-3 text-right">
-                                     <div className="w-20 h-1.5 bg-gray-700 rounded-full ml-auto overflow-hidden">
-                                         <div className="h-full bg-blue-500" style={{width: `${Math.min(100, (q.count / popularQueries[0].count) * 100)}%`}}></div>
-                                     </div>
-                                 </td>
-                             </tr>
-                         ))}
-                     </tbody>
-                 </table>
-             </div>
-        </div>
       </div>
     </div>
   );
 }
 
-function StatCard({ title, value, icon, color, subtitle }: any) {
+// Define types for StatCard props to fix build error
+interface StatCardProps {
+    title: string;
+    value: string | number;
+    icon: ReactNode;
+    color: 'blue' | 'purple' | 'green' | 'orange';
+    subtitle: string;
+}
+
+function StatCard({ title, value, icon, color, subtitle }: StatCardProps) {
     const colors = {
         blue: 'bg-blue-500/10 border-blue-500/20 text-blue-400',
         purple: 'bg-purple-500/10 border-purple-500/20 text-purple-400',
